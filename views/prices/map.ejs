@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="bi bi-map"></i> Carte interactive des prix</h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="/prices/map" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="materiau_id" class="form-label">Filtrer par matériau</label>
+                            <select class="form-select" id="materiau_id" name="materiau_id"
+                                onchange="this.form.submit()">
+                                <option value="">Tous les matériaux</option>
+                                <% materials.forEach(material=> { %>
+                                    <option value="<%= material.id %>" <%=selectedMaterial==material.id ? 'selected'
+                                        : '' %>>
+                                        <%= material.nom %>
+                                    </option>
+                                    <% }); %>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="map" style="height: 600px; width: 100%;" class="border rounded"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <script>
+        // Initialiser la carte (centrée sur Bujumbura par défaut)
+        const map = L.map('map').setView([-3.3822, 29.3644], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+    // Ajouter les marqueurs pour chaque soumission
+    <% submissions.forEach(submission => { %>
+        <% if (submission.latitude && submission.longitude) { %>
+            const marker<%= submission.id %> = L.marker([<%= submission.latitude %>, <%= submission.longitude %>]).addTo(map);
+                marker <%= submission.id %>.bindPopup(`
+                <strong><%= submission.materiau_nom %></strong> 
+                <% if (submission.statut === 'en_attente') { %>
+                    <span class="badge bg-warning text-dark" style="font-size: 0.7rem;">Nouveau</span>
+                <% } %><br>
+                Prix: <strong><%= submission.prix %> FBu</strong> / <%= submission.unite %><br>
+                Lieu: <%= submission.lieu %><br>
+                Date: <%= formatDate(submission.date_achat) %>
+            `);
+        <% } %>
+    <% }); %>
+
+    // Ajuster la vue si des marqueurs existent
+    <% if (submissions.length > 0 && submissions.some(s => s.latitude && s.longitude)) { %>
+        const markers = [];
+        <% submissions.forEach(submission => { %>
+            <% if (submission.latitude && submission.longitude) { %>
+                        markers.push(L.marker([<%= submission.latitude %>, <%= submission.longitude %>]));
+            <% } %>
+        <% }); %>
+        const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+    <% } %>
+    </script>
+
+    <%- include('../partials/footer') %>

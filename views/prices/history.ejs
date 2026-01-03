@@ -1,0 +1,91 @@
+<%- include('../partials/header') %>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-graph-up"></i> Historique des prix - <%= material.nom %></h2>
+        <p class="text-muted">Unité: <%= material.unite %></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <% if (history.length === 0) { %>
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Aucun historique disponible pour ce matériau.
+            </div>
+        <% } else { %>
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="priceChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-4">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Prix</th>
+                            <th>Lieu</th>
+                            <th>Évolution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% history.forEach((item, index) => { %>
+                            <tr>
+                                <td><%= formatDate(item.date_achat) %></td>
+                                <td><strong><%= item.prix %> FBu</strong></td>
+                                <td><%= item.lieu %></td>
+                                <td>
+                                    <% if (index > 0) { %>
+                                        <% const change = ((item.prix - history[index-1].prix) / history[index-1].prix * 100).toFixed(2); %>
+                                        <% if (change > 0) { %>
+                                            <span class="text-danger"><i class="bi bi-arrow-up"></i> +<%= change %>%</span>
+                                        <% } else if (change < 0) { %>
+                                            <span class="text-success"><i class="bi bi-arrow-down"></i> <%= change %>%</span>
+                                        <% } else { %>
+                                            <span class="text-muted"><i class="bi bi-dash"></i> Stable</span>
+                                        <% } %>
+                                    <% } else { %>
+                                        <span class="text-muted">-</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    <% if (history.length > 0) { %>
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [<% history.forEach((item, index) => { %>'<%= formatDate(item.date_achat) %>'<%= index < history.length - 1 ? ',' : '' %><% }); %>],
+                datasets: [{
+                    label: 'Prix (FBu)',
+                    data: [<% history.forEach((item, index) => { %><%= item.prix %><%= index < history.length - 1 ? ',' : '' %><% }); %>],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    <% } %>
+</script>
+
+<%- include('../partials/footer') %>
+

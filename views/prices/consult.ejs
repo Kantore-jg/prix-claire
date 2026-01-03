@@ -1,0 +1,270 @@
+<%- include('../partials/header') %>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="bi bi-list-ul"></i> Consultation des prix</h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="/prices/consult" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="materiau_id" class="form-label">Matériau</label>
+                            <select class="form-select" id="materiau_id" name="materiau_id">
+                                <option value="">Tous les matériaux</option>
+                                <% materials.forEach(material=> { %>
+                                    <option value="<%= material.id %>" <%=selectedMaterial==material.id ? 'selected'
+                                        : '' %>>
+                                        <%= material.nom %>
+                                    </option>
+                                    <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ville" class="form-label">Ville</label>
+                            <select class="form-select" id="ville" name="ville">
+                                <option value="">Toutes les villes</option>
+                                <% locations.forEach(loc=> { %>
+                                    <% if (loc.ville) { %>
+                                        <option value="<%= loc.ville %>" <%=selectedCity==loc.ville ? 'selected' : '' %>
+                                            >
+                                            <%= loc.ville %>
+                                        </option>
+                                        <% } %>
+                                            <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="region" class="form-label">Région</label>
+                            <select class="form-select" id="region" name="region">
+                                <option value="">Toutes les régions</option>
+                                <% locations.forEach(loc=> { %>
+                                    <% if (loc.region) { %>
+                                        <option value="<%= loc.region %>" <%=selectedRegion==loc.region ? 'selected'
+                                            : '' %>>
+                                            <%= loc.region %>
+                                        </option>
+                                        <% } %>
+                                            <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Filtrer
+                            </button>
+                            <a href="/prices/consult" class="btn btn-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                            </a>
+                            <a href="/prices/map" class="btn btn-info">
+                                <i class="bi bi-map"></i> Voir sur la carte
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <% if (submissions.length===0) { %>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Aucune soumission trouvée avec ces critères.
+                </div>
+                <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Matériau</th>
+                                    <th>Prix</th>
+                                    <th>Lieu</th>
+                                    <th>Date</th>
+                                    <th>Source</th>
+                                    <th>Contributeur</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% submissions.forEach(submission=> { %>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <%= submission.materiau_nom %>
+                                            </strong>
+                                            <br><small class="text-muted">
+                                                <%= submission.unite %>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <strong class="text-primary">
+                                                <%= submission.prix %> FBu
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <%= submission.lieu %>
+                                                <% if (submission.ville) { %>
+                                                    <br><small class="text-muted">
+                                                        <%= submission.ville %>
+                                                    </small>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <%= formatDate(submission.date_achat) %>
+                                        </td>
+                                        <td>
+                                            <%= submission.source || '-' %>
+                                        </td>
+                                        <td>
+                                            <%= submission.user_nom %>
+                                                <% if (submission.badge_fiable) { %>
+                                                    <i class="bi bi-patch-check-fill text-primary"
+                                                        title="Contributeur fiable"></i>
+                                                    <% } %>
+                                                        <br><small class="text-muted">
+                                                            <%= submission.type_compte %>
+                                                        </small>
+                                        </td>
+                                        <td>
+                                            <% if (submission.statut==='en_attente' ) { %>
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i>
+                                                    Nouveau</span>
+                                                <% } else if (submission.statut==='valide' ) { %>
+                                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i>
+                                                        Vérifié</span>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <a href="/prices/history/<%= submission.materiau_id %>"
+                                                class="btn btn-sm btn-info" title="Historique">
+                                                <i class="bi bi-graph-up"></i>
+                                            </a>
+                                            <% if (typeof user !=='undefined' && user) { %>
+                                                <% if (user.typeCompte==='artisan' ) { %>
+                                                    <button class="btn btn-sm btn-success vote-btn"
+                                                        data-soumission="<%= submission.id %>" data-type="positif"
+                                                        title="Vote positif">
+                                                        <i class="bi bi-hand-thumbs-up"></i>
+                                                        <%= submission.votes_positifs || 0 %>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger vote-btn"
+                                                        data-soumission="<%= submission.id %>" data-type="negatif"
+                                                        title="Vote négatif">
+                                                        <i class="bi bi-hand-thumbs-down"></i>
+                                                        <%= submission.votes_negatifs || 0 %>
+                                                    </button>
+                                                    <% } %>
+                                                        <button class="btn btn-sm btn-primary comment-btn"
+                                                            data-soumission="<%= submission.id %>" title="Commenter">
+                                                            <i class="bi bi-chat"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-warning report-btn"
+                                                            data-soumission="<%= submission.id %>" title="Signaler">
+                                                            <i class="bi bi-flag"></i>
+                                                        </button>
+                                                        <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+        </div>
+    </div>
+
+    <!-- Modal Commentaire -->
+    <div class="modal fade" id="commentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form id="commentForm" method="POST">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ajouter un commentaire</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea name="commentaire" class="form-control" rows="3" required
+                            placeholder="Votre avis sur ce prix..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Publier</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Signalement -->
+    <div class="modal fade" id="reportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form id="reportForm" method="POST">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Signaler ce prix</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small">Pourquoi signalez-vous ce prix ? (ex: prix irréaliste, mauvais
+                            lieu...)</p>
+                        <textarea name="raison" class="form-control" rows="3" required
+                            placeholder="Raison du signalement..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-danger">Signaler</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des votes
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const soumissionId = this.dataset.soumission;
+                const typeVote = this.dataset.type;
+
+                fetch(`/moderation/vote/${soumissionId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ type_vote: typeVote })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Erreur lors du vote');
+                        }
+                    });
+            });
+        });
+
+        // Gestion des commentaires (ouverture modal)
+        const commentModal = new bootstrap.Modal(document.getElementById('commentModal'));
+        document.querySelectorAll('.comment-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('commentForm').action = `/moderation/comment/${this.dataset.soumission}`;
+                commentModal.show();
+            });
+        });
+
+        // Gestion des signalements (ouverture modal)
+        const reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
+        document.querySelectorAll('.report-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('reportForm').action = `/moderation/report/${this.dataset.soumission}`;
+                reportModal.show();
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

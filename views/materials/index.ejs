@@ -1,0 +1,57 @@
+<%- include('../partials/header') %>
+
+<div class="row mb-4">
+    <div class="col-md-12 d-flex justify-content-between align-items-center">
+        <h2><i class="bi bi-box"></i> Matériaux</h2>
+        <% if (user && user.typeCompte === 'commercant') { %>
+            <a href="/materials/add" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Ajouter un matériau
+            </a>
+        <% } %>
+    </div>
+</div>
+
+<div class="row">
+    <% if (materials.length === 0) { %>
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Aucun matériau disponible.
+            </div>
+        </div>
+    <% } else { %>
+        <% materials.forEach(material => { %>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-box"></i> <%= material.nom %>
+                        </h5>
+                        <p class="card-text">
+                            <strong>Unité:</strong> <%= material.unite %><br>
+                            <% if (material.description) { %>
+                                <small class="text-muted"><%= material.description %></small><br>
+                            <% } %>
+                            <strong>Soumissions:</strong> <%= material.nombre_soumissions || 0 %>
+                        </p>
+                        <% if (material.ajoute_par_nom) { %>
+                            <small class="text-muted">
+                                Ajouté par: <%= material.ajoute_par_nom %>
+                            </small>
+                        <% } %>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/prices/consult?materiau_id=<%= material.id %>" class="btn btn-primary btn-sm">
+                            <i class="bi bi-search"></i> Voir les prix
+                        </a>
+                        <a href="/prices/history/<%= material.id %>" class="btn btn-info btn-sm">
+                            <i class="bi bi-graph-up"></i> Historique
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+

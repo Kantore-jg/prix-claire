@@ -1,0 +1,160 @@
+<%- include('../partials/header') %>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="bi bi-person-badge"></i> Mes soumissions de prix</h2>
+            <p class="text-muted">Suivez les interactions (votes et commentaires) sur vos publications.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <% if (submissions.length===0) { %>
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-info-circle display-4 text-info mb-3"></i>
+                        <h4>Vous n'avez pas encore soumis de prix.</h4>
+                        <p class="text-muted">Partagez vos relevés de prix pour aider la communauté !</p>
+                        <a href="/prices/submit" class="btn btn-success mt-3">
+                            <i class="bi bi-plus-circle"></i> Soumettre mon premier prix
+                        </a>
+                    </div>
+                </div>
+                <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle border shadow-sm rounded">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Matériau</th>
+                                    <th>Prix (FBu)</th>
+                                    <th>Date</th>
+                                    <th>Lieu</th>
+                                    <th class="text-center">Interactions</th>
+                                    <th class="text-center">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% submissions.forEach(submission=> { %>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <%= submission.materiau_nom %>
+                                            </strong>
+                                            <br><small class="text-muted">
+                                                <%= submission.unite %>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <strong class="text-primary">
+                                                <%= submission.prix %> FBu
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <%= formatDate(submission.date_achat) %>
+                                        </td>
+                                        <td>
+                                            <%= submission.lieu %>
+                                                <% if (submission.ville) { %>
+                                                    <br><small class="text-muted">
+                                                        <%= submission.ville %>
+                                                    </small>
+                                                    <% } %>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-3">
+                                                <span
+                                                    class="badge bg-success-subtle text-success border border-success-subtle"
+                                                    title="Votes positifs">
+                                                    <i class="bi bi-hand-thumbs-up"></i>
+                                                    <%= submission.positives %>
+                                                </span>
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle"
+                                                    title="Votes négatifs">
+                                                    <i class="bi bi-hand-thumbs-down"></i>
+                                                    <%= submission.negatives %>
+                                                </span>
+                                                <button class="btn btn-sm btn-outline-primary view-comments"
+                                                    data-id="<%= submission.id %>" data-bs-toggle="modal"
+                                                    data-bs-target="#commentsModal">
+                                                    <i class="bi bi-chat-text"></i>
+                                                    <%= submission.comment_count %>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <% if (submission.statut==='valide' ) { %>
+                                                <span class="badge bg-success"><i class="bi bi-check-circle"></i>
+                                                    Publié</span>
+                                                <% } else if (submission.statut==='en_attente' ) { %>
+                                                    <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i>
+                                                        En attente</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-danger"><i class="bi bi-x-circle"></i>
+                                                            Rejeté</span>
+                                                        <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+        </div>
+    </div>
+
+    <!-- Modal pour les commentaires -->
+    <div class="modal fade" id="commentsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-chat-dots"></i> Commentaires reçu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="commentsList" class="list-group list-group-flush">
+                        <!-- Les commentaires seront chargés ici -->
+                        <div class="text-center py-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.view-comments').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const soumissionId = this.dataset.id;
+                const commentsList = document.getElementById('commentsList');
+
+                commentsList.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
+
+                fetch(`/moderation/comments/${soumissionId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.comments.length > 0) {
+                            commentsList.innerHTML = data.comments.map(c => `
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-primary">${c.user_nom} <small class="text-muted">(${c.type_compte})</small></h6>
+                                    <small class="text-muted">${new Date(c.created_at).toLocaleDateString()}</small>
+                                </div>
+                                <p class="mb-1">${c.commentaire}</p>
+                            </div>
+                        `).join('');
+                        } else {
+                            commentsList.innerHTML = '<div class="alert alert-light text-center">Aucun commentaire sur cette soumission.</div>';
+                        }
+                    })
+                    .catch(err => {
+                        commentsList.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des commentaires.</div>';
+                    });
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

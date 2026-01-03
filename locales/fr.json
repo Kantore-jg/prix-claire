@@ -1,0 +1,108 @@
+{
+  "app": {
+    "title": "Suivi des Prix des Matériaux de Construction",
+    "description": "Plateforme collaborative pour suivre les prix des matériaux de construction"
+  },
+  "nav": {
+    "home": "Accueil",
+    "prices": "Prix",
+    "submit": "Soumettre un prix",
+    "materials": "Matériaux",
+    "dashboard": "Tableau de bord",
+    "login": "Connexion",
+    "register": "Inscription",
+    "logout": "Déconnexion",
+    "profile": "Profil"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "name": "Nom complet",
+    "phone": "Téléphone",
+    "accountType": "Type de compte",
+    "artisan": "Artisan",
+    "particulier": "Particulier",
+    "commercant": "Commerçant",
+    "submit": "Soumettre",
+    "alreadyHaveAccount": "Vous avez déjà un compte?",
+    "noAccount": "Vous n'avez pas de compte?",
+    "loginSuccess": "Connexion réussie",
+    "registerSuccess": "Inscription réussie",
+    "logoutSuccess": "Déconnexion réussie"
+  },
+  "materials": {
+    "cement": "Ciment",
+    "sand": "Sable",
+    "bricks": "Briques",
+    "rebar": "Fer à Béton",
+    "unit": "Unité",
+    "addMaterial": "Ajouter un matériau",
+    "materialName": "Nom du matériau",
+    "unit": "Unité de mesure"
+  },
+  "priceSubmission": {
+    "title": "Soumettre un prix",
+    "material": "Matériau",
+    "price": "Prix",
+    "location": "Lieu",
+    "city": "Ville",
+    "region": "Région",
+    "date": "Date d'achat",
+    "source": "Source (magasin, fournisseur)",
+    "photo": "Photo du reçu ou du produit",
+    "geolocation": "Géolocalisation",
+    "autoLocation": "Détection automatique",
+    "manualLocation": "Saisie manuelle",
+    "submit": "Soumettre",
+    "success": "Prix soumis avec succès",
+    "error": "Erreur lors de la soumission"
+  },
+  "priceConsultation": {
+    "title": "Consultation des prix",
+    "filterByMaterial": "Filtrer par matériau",
+    "filterByRegion": "Filtrer par région",
+    "viewMap": "Voir sur la carte",
+    "viewList": "Voir en liste",
+    "averagePrice": "Prix moyen",
+    "priceHistory": "Historique des prix",
+    "noData": "Aucune donnée disponible"
+  },
+  "moderation": {
+    "vote": "Voter",
+    "report": "Signaler",
+    "comment": "Commenter",
+    "reliableContributor": "Contributeur fiable",
+    "positiveVote": "Vote positif",
+    "negativeVote": "Vote négatif",
+    "reportReason": "Raison du signalement"
+  },
+  "alerts": {
+    "title": "Alertes",
+    "createAlert": "Créer une alerte",
+    "priceIncrease": "Hausse de prix",
+    "priceDecrease": "Baisse de prix",
+    "priceChange": "Changement de prix",
+    "threshold": "Seuil",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "reset": "Réinitialiser",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Attention",
+    "info": "Information"
+  }
+}
+

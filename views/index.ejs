@@ -1,0 +1,97 @@
+<%- include('partials/header') %>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="mb-4"><i class="bi bi-clock-history"></i> Dernières soumissions</h2>
+
+            <% if (recentSubmissions.length===0) { %>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Aucune soumission disponible pour le moment.
+                </div>
+                <% } else { %>
+                    <div class="list-group">
+                        <% recentSubmissions.forEach(submission=> { %>
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">
+                                        <i class="bi bi-box"></i>
+                                        <%= submission.materiau_nom %>
+                                            <span class="badge bg-primary">
+                                                <%= submission.prix %> FBu / <%= submission.unite %>
+                                            </span>
+                                            <% if (submission.statut==='en_attente' ) { %>
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i>
+                                                    Nouveau</span>
+                                                <% } else if (submission.statut==='valide' ) { %>
+                                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i>
+                                                        Vérifié</span>
+                                                    <% } %>
+                                    </h5>
+                                    <small>
+                                        <%= formatDate(submission.date_achat) %>
+                                    </small>
+                                </div>
+                                <p class="mb-1">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <%= submission.lieu %>
+                                        <% if (submission.ville) { %>
+                                            <span class="text-muted">(<%= submission.ville %>)</span>
+                                            <% } %>
+                                </p>
+                                <small class="text-muted">
+                                    Par <%= submission.user_nom %> (<%= submission.type_compte %>)
+                                            <% if (submission.votes_positifs> 0 || submission.votes_negatifs > 0) { %>
+                                                | <i class="bi bi-hand-thumbs-up"></i>
+                                                <%= submission.votes_positifs %>
+                                                    <i class="bi bi-hand-thumbs-down"></i>
+                                                    <%= submission.votes_negatifs %>
+                                                        <% } %>
+                                </small>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } %>
+        </div>
+
+        <div class="col-md-4">
+            <h2 class="mb-4"><i class="bi bi-graph-up"></i> Prix moyens</h2>
+
+            <% if (averagePrices.length===0) { %>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Aucune donnée disponible.
+                </div>
+                <% } else { %>
+                    <div class="list-group">
+                        <% averagePrices.forEach(item=> { %>
+                            <div class="list-group-item">
+                                <h6 class="mb-1">
+                                    <%= item.materiau %>
+                                </h6>
+                                <p class="mb-0">
+                                    <strong>
+                                        <%= item.prix_moyen %> FBu / <%= item.unite %>
+                                    </strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <%= item.nombre_soumissions %> soumission(s)
+                                    </small>
+                                </p>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } %>
+
+                        <div class="mt-4">
+                            <a href="/prices/consult" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Consulter tous les prix
+                            </a>
+                            <% if (user) { %>
+                                <a href="/prices/submit" class="btn btn-success w-100 mt-2">
+                                    <i class="bi bi-plus-circle"></i> Soumettre un prix
+                                </a>
+                                <% } %>
+                        </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
